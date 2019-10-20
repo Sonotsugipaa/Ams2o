@@ -1,0 +1,4 @@
+ams2o::separator: ' + '
+
+hello: { 'Hello' 'World' '!' }
+hello

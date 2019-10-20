@@ -1,0 +1,1 @@
+bin/ams2o test.ams2
