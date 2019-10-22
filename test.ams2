@@ -8,6 +8,6 @@ format(arg): {
 }
 
 format('1;34')
-ams2o::ascii('Hellowies')
+ams2o::ascii('Hello')
 format()
 ams2o::ascii("\n")

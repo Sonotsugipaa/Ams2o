@@ -321,19 +321,6 @@ namespace {
 		return r;
 	}
 
-	void debug_defs(amscript2::Scope& scope) {
-		const auto& base = scope.getBaseLayer();
-		for(const auto& def : base) {
-			std::cout << "DEFINED " << def.first << " AS ";
-			amscript2::ScopeView sv = scope;
-			std::vector<amscript2::Value> got = def.second->evaluate({}, sv);
-			std::cout << (got.empty()? "EMPTY" : got[0].strValue());
-			if(got.size() > 1)
-				std::cout << "...";
-			std::cout << std::endl;
-		}
-	}
-
 }
 
 
@@ -365,9 +352,19 @@ namespace ext {
 		return r;
 	}
 
+	std::vector<Value> concat(std::vector<Value> values, amscript2::ScopeView&) {
+		std::string r;  r.reserve(values.size() * 4);
+		if(! values.empty())
+			r += values[0].strValue();
+		for(size_t i=1; i < values.size(); ++i)
+			r += values[i].strValue();
+		return {r};
+	}
+
 	const amscript2::Script extension = []() {
 		amscript2::Script ext;
 		ext.define(ref_t(AMS2O_NS, "ascii"), ascii);
+		ext.define(ref_t(AMS2O_NS, "concat"), concat);
 		return ext;
 	}();
 
