@@ -1,4 +1,13 @@
-ams2o::separator: ' + '
+ams2o::mode:       ams2o::binary
+ams2o::word_size:  ams2o::int8
+ams2o::byte_order: ams2o::big_endian
 
-hello: { 'Hello' 'World' '!' }
-hello
+format(arg): {
+	27
+	ams2o::ascii('[' arg 'm')
+}
+
+format('1;34')
+ams2o::ascii('Hellowies')
+format()
+ams2o::ascii("\n")
