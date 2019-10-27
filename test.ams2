@@ -1,13 +1,10 @@
-ams2o::mode:       ams2o::binary
-ams2o::word_size:  ams2o::int8
-ams2o::byte_order: ams2o::big_endian
+// Example Ams2o script
 
-format(arg): {
-	27
-	ams2o::ascii('[' arg 'm')
-}
+ams2o::mode: ams2o::text
+ams2o::separator: ' + '
+ams2o::show_warnings: ams2o::false
 
-format('1;34')
-ams2o::ascii('Hello')
-format()
-ams2o::ascii("\n")
+hello(whom): { 'Hello,' whom '!' }
+
+hello('world')
+'The ASCII code for "a" is' ams2o::ascii('a')

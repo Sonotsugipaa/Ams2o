@@ -1,4 +1,5 @@
 #include <amscript/amscript2.hpp>
+#include <amscript/except.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -378,20 +379,27 @@ int main(int argn, char** args) {
 
 	amscript2::Script script;
 
-	if(argn > 1)
-		script = amscript2::Script(from_file(args[1]));
-	else
-		script = amscript2::Script(from_stdin());
+	try {
+		if(argn > 1)
+			script = amscript2::Script(from_file(args[1]));
+		else
+			script = amscript2::Script(from_stdin());
 
-	script.import(ext::extension);
+		script.import(ext::extension);
 
-	std::vector<amscript2::Value> result = script.run();
-	parse_options(options, script);
+		std::vector<amscript2::Value> result = script.run();
+		parse_options(options, script);
 
-	if(options.text_to_bin)
-		std::cout << binary(options, result);
-	else
-		std::cout << concat(options, result) << std::endl;
+		if(options.text_to_bin)
+			std::cout << binary(options, result);
+		else
+			std::cout << concat(options, result) << std::endl;
+	} catch(ParseException& ex) {
+		std::cerr
+			<< "An error occurred while interpreting the script.\n"
+			<< ex.value << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }
