@@ -16,10 +16,14 @@ namespace {
 	constexpr unsigned int AMS2O_BIG_ENDIAN   = 1;
 	constexpr unsigned int AMS2O_SMALL_ENDIAN = 0x80000000;
 
-	constexpr unsigned int AMS2O_SIZE_8       = 8;
-	constexpr unsigned int AMS2O_SIZE_16      = 16;
-	constexpr unsigned int AMS2O_SIZE_32      = 32;
-	constexpr unsigned int AMS2O_SIZE_64      = 64;
+	constexpr unsigned int AMS2O_SIZE_8       = 0x08;
+	constexpr unsigned int AMS2O_SIZE_16      = 0x10;
+	constexpr unsigned int AMS2O_SIZE_32      = 0x20;
+	constexpr unsigned int AMS2O_SIZE_64      = 0x40;
+	constexpr unsigned int AMS2O_SIZE_8U      = 0x0800;
+	constexpr unsigned int AMS2O_SIZE_16U     = 0x1000;
+	constexpr unsigned int AMS2O_SIZE_32U     = 0x2000;
+	constexpr unsigned int AMS2O_SIZE_64U     = 0x4000;
 
 	constexpr unsigned int AMS2O_TRUE         = 1;
 	constexpr unsigned int AMS2O_FALSE        = 0;
@@ -40,7 +44,7 @@ namespace {
 		bool show_warnings = true;
 
 		void warn(std::string message) const {
-			if(show_warnings)  std::cout << "WARNING - " << message << std::endl;
+			if(show_warnings)  std::cerr << "WARNING - " << message << std::endl;
 		}
 	};
 
@@ -88,7 +92,8 @@ namespace {
 	std::string int_to_binary_str_se(uint_t x) {
 		std::string r;  r.resize(word_length<bits>);
 		for(uint_t i=0; i < word_length<bits>; ++i)
-			r[i] = (x << (i*8)) & 0xFF;
+			r[i] = (x >> ((word_length<bits> - (i+1)) * 8)) & 0xFF;
+			//r[i] = (x << (i*8)) & 0xFF;
 		return r;
 	}
 
@@ -96,11 +101,12 @@ namespace {
 	std::string int_to_binary_str_be(uint_t x) {
 		std::string r;  r.resize(word_length<bits>);
 		for(uint_t i=0; i < word_length<bits>; ++i)
-			r[i] = (x << ((word_length<bits> - (i+1)) * 8)) & 0xFF;
+			//r[i] = (x << ((word_length<bits> - (i+1)) * 8)) & 0xFF;
+			r[i] = (x >> (i*8)) & 0xFF;
 		return r;
 	}
 
-	template<unsigned byte_order, unsigned bits>
+	template<unsigned byte_order, unsigned bits, bool warn_neg>
 	std::string text_to_binary(const Options& opt, const amscript2::Value& value) {
 		static_assert(
 			(byte_order == AMS2O_SMALL_ENDIAN) || (byte_order == AMS2O_BIG_ENDIAN),
@@ -110,15 +116,17 @@ namespace {
 			opt.warn("Invalid integer value: " + value.strValue());
 		} else {
 			uint_t ivalue = value.intValue();
-			if(ivalue < 0) {
-				opt.warn("Binary word should be signed: " + value.strValue());
-			}
-			else
-			if(ivalue > word_limit<bits>) {
-				opt.warn(
-					  "Integer overflow: "
-					+ value.strValue() + " > "
-					+ word_limit_str<bits>);
+			if constexpr(warn_neg) {
+				if(value.intValue() < 0) {
+					opt.warn("Binary word should be signed: " + value.strValue());
+				}
+				else
+				if(ivalue > word_limit<bits>) {
+					opt.warn(
+						  "Integer overflow: "
+						+ value.strValue() + " > "
+						+ word_limit_str<bits>);
+				}
 			}
 			if constexpr(byte_order == AMS2O_SMALL_ENDIAN)
 				r = int_to_binary_str_se<bits>(ivalue);
@@ -128,38 +136,36 @@ namespace {
 		return r;
 	}
 
-	template<unsigned byte_order, unsigned bits>
+	template<unsigned byte_order, unsigned bits, bool warn_neg>
 	std::string text_to_binary(
 			const Options& opt,
 			const std::vector<amscript2::Value>& values
 	) {
 		std::string r;  r.reserve(heuristic_length_binary(values.size() * opt.word_size));
 		if(! values.empty())
-			r += text_to_binary<byte_order, bits>(opt, values[0]);
+			r += text_to_binary<byte_order, bits, warn_neg>(opt, values[0]);
 		for(size_t i=1; i < values.size(); ++i)
-			r += opt.separator + text_to_binary<byte_order, bits>(opt, values[i]);
+			r += opt.separator + text_to_binary<byte_order, bits, warn_neg>(opt, values[i]);
 		return r;
 	}
 
 	std::string binary(const Options& opt, const std::vector<amscript2::Value>& values) {
 		std::string r;
+		constexpr auto SE = AMS2O_SMALL_ENDIAN;
+		constexpr auto BE = AMS2O_BIG_ENDIAN;
 		/* too much boilerplate code for me to even care about
 		 * ctrl+V rules anymore */
 		switch(opt.byte_order) {
 			case AMS2O_SMALL_ENDIAN:
 				switch(opt.word_size) {
-					case AMS2O_SIZE_8:
-						r = text_to_binary<AMS2O_SMALL_ENDIAN, 8>(opt, values);
-					break;
-					case AMS2O_SIZE_16:
-						r = text_to_binary<AMS2O_SMALL_ENDIAN, 16>(opt, values);
-					break;
-					case AMS2O_SIZE_32:
-						r = text_to_binary<AMS2O_SMALL_ENDIAN, 32>(opt, values);
-					break;
-					case AMS2O_SIZE_64:
-						r = text_to_binary<AMS2O_SMALL_ENDIAN, 64>(opt, values);
-					break;
+					case AMS2O_SIZE_8:   r = text_to_binary<SE,  8,  true>(opt, values);  break;
+					case AMS2O_SIZE_16:  r = text_to_binary<SE, 16,  true>(opt, values);  break;
+					case AMS2O_SIZE_32:  r = text_to_binary<SE, 32,  true>(opt, values);  break;
+					case AMS2O_SIZE_64:  r = text_to_binary<SE, 64,  true>(opt, values);  break;
+					case AMS2O_SIZE_8U:  r = text_to_binary<SE,  8, false>(opt, values);  break;
+					case AMS2O_SIZE_16U: r = text_to_binary<SE, 16, false>(opt, values);  break;
+					case AMS2O_SIZE_32U: r = text_to_binary<SE, 32, false>(opt, values);  break;
+					case AMS2O_SIZE_64U: r = text_to_binary<SE, 64, false>(opt, values);  break;
 					default:
 						opt.warn("Invalid word_size option: " + std::to_string(opt.word_size));
 					break;
@@ -167,18 +173,14 @@ namespace {
 			break;
 			case AMS2O_BIG_ENDIAN:
 				switch(opt.word_size) {
-					case AMS2O_SIZE_8:
-						r = text_to_binary<AMS2O_BIG_ENDIAN, 8>(opt, values);
-					break;
-					case AMS2O_SIZE_16:
-						r = text_to_binary<AMS2O_BIG_ENDIAN, 16>(opt, values);
-					break;
-					case AMS2O_SIZE_32:
-						r = text_to_binary<AMS2O_BIG_ENDIAN, 32>(opt, values);
-					break;
-					case AMS2O_SIZE_64:
-						r = text_to_binary<AMS2O_BIG_ENDIAN, 64>(opt, values);
-					break;
+					case AMS2O_SIZE_8:   r = text_to_binary<BE,  8,  true>(opt, values);  break;
+					case AMS2O_SIZE_16:  r = text_to_binary<BE, 16,  true>(opt, values);  break;
+					case AMS2O_SIZE_32:  r = text_to_binary<BE, 32,  true>(opt, values);  break;
+					case AMS2O_SIZE_64:  r = text_to_binary<BE, 64,  true>(opt, values);  break;
+					case AMS2O_SIZE_8U:  r = text_to_binary<BE,  8, false>(opt, values);  break;
+					case AMS2O_SIZE_16U: r = text_to_binary<BE, 16, false>(opt, values);  break;
+					case AMS2O_SIZE_32U: r = text_to_binary<BE, 32, false>(opt, values);  break;
+					case AMS2O_SIZE_64U: r = text_to_binary<BE, 64, false>(opt, values);  break;
 					default:
 						opt.warn("Invalid word_size option: " + std::to_string(opt.word_size));
 					break;
@@ -212,13 +214,14 @@ namespace {
 		if(! values.empty()) {
 			if(values[0].type() == amscript2::Type::INTEGER) {
 				int_t arg = values[0].intValue();
-				if(arg == AMS2O_SIZE_8)  opt.word_size = AMS2O_SIZE_8;
-				else
-				if(arg == AMS2O_SIZE_16)  opt.word_size = AMS2O_SIZE_16;
-				else
-				if(arg == AMS2O_SIZE_32)  opt.word_size = AMS2O_SIZE_32;
-				else
-				if(arg == AMS2O_SIZE_64)  opt.word_size = AMS2O_SIZE_64;
+				     if(arg == AMS2O_SIZE_8)   opt.word_size = AMS2O_SIZE_8;
+				else if(arg == AMS2O_SIZE_16)  opt.word_size = AMS2O_SIZE_16;
+				else if(arg == AMS2O_SIZE_32)  opt.word_size = AMS2O_SIZE_32;
+				else if(arg == AMS2O_SIZE_64)  opt.word_size = AMS2O_SIZE_64;
+				else if(arg == AMS2O_SIZE_8U)  opt.word_size = AMS2O_SIZE_8U;
+				else if(arg == AMS2O_SIZE_16U) opt.word_size = AMS2O_SIZE_16U;
+				else if(arg == AMS2O_SIZE_32U) opt.word_size = AMS2O_SIZE_32U;
+				else if(arg == AMS2O_SIZE_64U) opt.word_size = AMS2O_SIZE_64U;
 				else
 				opt.warn("Invalid word size \""+values[0].strValue()+"\"");
 			}
@@ -284,6 +287,10 @@ namespace {
 		+ build_def_src_ln("int16", AMS2O_SIZE_16)
 		+ build_def_src_ln("int32", AMS2O_SIZE_32)
 		+ build_def_src_ln("int64", AMS2O_SIZE_64)
+		+ build_def_src_ln("uint8", AMS2O_SIZE_8U)
+		+ build_def_src_ln("uint16", AMS2O_SIZE_16U)
+		+ build_def_src_ln("uint32", AMS2O_SIZE_32U)
+		+ build_def_src_ln("uint64", AMS2O_SIZE_64U)
 		+ build_def_src_ln("true", AMS2O_TRUE)
 		+ build_def_src_ln("false", AMS2O_FALSE)
 		+ build_def_src_ln("binary", AMS2O_BINARY)
