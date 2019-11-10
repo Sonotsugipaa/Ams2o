@@ -25,7 +25,10 @@ build/%.o: src/%.cpp
 	g++ $(CPPFLAGS) $< -c -o"$@"
 
 
-lib/libamscript2.a:
+%/makefile:
+	git submodule update --init $(patsubst %/makefile,%,$@)
+
+lib/libamscript2.a: Amscript2/makefile
 	# ----- External static library ----- #
 	make --no-print-directory lib/
 	make --directory="Amscript2/" lib/libamscript2.a
