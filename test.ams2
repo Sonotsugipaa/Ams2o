@@ -1,10 +1,10 @@
 // Example Ams2o script
 
-ams2o::mode: ams2o::text
+ams2o::mode: text
 ams2o::separator: ' + '
-ams2o::show_warnings: ams2o::false
+ams2o::show_warnings: false
 
 hello(whom): { 'Hello,' whom '!' }
 
 hello('world')
-'The ASCII code for "a" is' ams2o::ascii('a')
+'The ASCII code for "a" is' ascii('a')

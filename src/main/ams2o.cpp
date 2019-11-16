@@ -13,23 +13,23 @@ namespace {
 	using amscript2::int_t;
 	using uint_t = unsigned long long int;
 
-	constexpr unsigned int AMS2O_BIG_ENDIAN   = 1;
-	constexpr unsigned int AMS2O_SMALL_ENDIAN = 0x80000000;
+	constexpr int_t AMS2O_BIG_ENDIAN   = 1;
+	constexpr int_t AMS2O_SMALL_ENDIAN = 0x80000000;
 
-	constexpr unsigned int AMS2O_SIZE_8       = 0x08;
-	constexpr unsigned int AMS2O_SIZE_16      = 0x10;
-	constexpr unsigned int AMS2O_SIZE_32      = 0x20;
-	constexpr unsigned int AMS2O_SIZE_64      = 0x40;
-	constexpr unsigned int AMS2O_SIZE_8U      = 0x0800;
-	constexpr unsigned int AMS2O_SIZE_16U     = 0x1000;
-	constexpr unsigned int AMS2O_SIZE_32U     = 0x2000;
-	constexpr unsigned int AMS2O_SIZE_64U     = 0x4000;
+	constexpr int_t AMS2O_SIZE_8       = 0x08;
+	constexpr int_t AMS2O_SIZE_16      = 0x10;
+	constexpr int_t AMS2O_SIZE_32      = 0x20;
+	constexpr int_t AMS2O_SIZE_64      = 0x40;
+	constexpr int_t AMS2O_SIZE_8U      = 0x0800;
+	constexpr int_t AMS2O_SIZE_16U     = 0x1000;
+	constexpr int_t AMS2O_SIZE_32U     = 0x2000;
+	constexpr int_t AMS2O_SIZE_64U     = 0x4000;
 
-	constexpr unsigned int AMS2O_TRUE         = 1;
-	constexpr unsigned int AMS2O_FALSE        = 0;
+	constexpr int_t AMS2O_TRUE         = 1;
+	constexpr int_t AMS2O_FALSE        = 0;
 
-	constexpr unsigned int AMS2O_BINARY       = 0;
-	constexpr unsigned int AMS2O_TEXT         = 1;
+	constexpr int_t AMS2O_BINARY       = 0;
+	constexpr int_t AMS2O_TEXT         = 1;
 
 	const amscript2::Namespace AMS2O_NS = amscript2::Namespace("ams2o");
 
@@ -276,25 +276,10 @@ namespace {
 		parse_separator(opt, scr);
 	}
 
-	std::string build_def_src_ln(std::string ref, int_t val) {
-		return AMS2O_NS.strValue() + ref + ": " + std::to_string(val) + '\n';
-	}
-
-	const std::string script_extension_src =
-		  build_def_src_ln("big_endian", AMS2O_BIG_ENDIAN)
-		+ build_def_src_ln("small_endian", AMS2O_SMALL_ENDIAN)
-		+ build_def_src_ln("int8", AMS2O_SIZE_8)
-		+ build_def_src_ln("int16", AMS2O_SIZE_16)
-		+ build_def_src_ln("int32", AMS2O_SIZE_32)
-		+ build_def_src_ln("int64", AMS2O_SIZE_64)
-		+ build_def_src_ln("uint8", AMS2O_SIZE_8U)
-		+ build_def_src_ln("uint16", AMS2O_SIZE_16U)
-		+ build_def_src_ln("uint32", AMS2O_SIZE_32U)
-		+ build_def_src_ln("uint64", AMS2O_SIZE_64U)
-		+ build_def_src_ln("true", AMS2O_TRUE)
-		+ build_def_src_ln("false", AMS2O_FALSE)
-		+ build_def_src_ln("binary", AMS2O_BINARY)
-		+ build_def_src_ln("text", AMS2O_TEXT);
+	const amscript2::Script script_extension = [] {
+		amscript2::Script ext;
+		return ext;
+	} ();
 
 	constexpr size_t STREAM_BUFFER_SIZE = 1024;
 
@@ -311,9 +296,9 @@ namespace {
 
 	amscript2::Script from_file(const char* path) {
 		std::ifstream is = std::ifstream(path);
-		amscript2::Script r;
+		amscript2::Script r = script_extension;
 		if(is) {
-			std::string src = script_extension_src + file_to_str(is);
+			std::string src = file_to_str(is);
 			r = amscript2::Script(std::move(src));
 		} else {
 			std::cerr << "ERROR: file not found: " << path << std::endl;
@@ -324,8 +309,8 @@ namespace {
 
 	amscript2::Script from_stdin() {
 		amscript2::Script r;
-		std::string src = script_extension_src + file_to_str(std::cin);
-		r = amscript2::Script(std::move(src));
+		/*std::string src = script_extension_src + file_to_str(std::cin);
+		r = amscript2::Script(std::move(src));*/
 		return r;
 	}
 
@@ -371,8 +356,23 @@ namespace ext {
 
 	const amscript2::Script extension = []() {
 		amscript2::Script ext;
-		ext.define(ref_t(AMS2O_NS, "ascii"), ascii);
-		ext.define(ref_t(AMS2O_NS, "concat"), concat);
+		using val = amscript2::Value;
+		ext.define(ref_t("big_endian"),   val(AMS2O_BIG_ENDIAN),   true);
+		ext.define(ref_t("small_endian"), val(AMS2O_SMALL_ENDIAN), true);
+		ext.define(ref_t("int8"),   val(AMS2O_SIZE_8),   true);
+		ext.define(ref_t("int16"),  val(AMS2O_SIZE_16),  true);
+		ext.define(ref_t("int32"),  val(AMS2O_SIZE_32),  true);
+		ext.define(ref_t("int64"),  val(AMS2O_SIZE_64),  true);
+		ext.define(ref_t("uint8"),  val(AMS2O_SIZE_8U),  true);
+		ext.define(ref_t("uint16"), val(AMS2O_SIZE_16U), true);
+		ext.define(ref_t("uint32"), val(AMS2O_SIZE_32U), true);
+		ext.define(ref_t("uint64"), val(AMS2O_SIZE_64U), true);
+		ext.define(ref_t("true"),   val(AMS2O_TRUE),     true);
+		ext.define(ref_t("false"),  val(AMS2O_FALSE),    true);
+		ext.define(ref_t("binary"), val(AMS2O_BINARY),   true);
+		ext.define(ref_t("text"),   val(AMS2O_TEXT),     true);
+		ext.define(ref_t(AMS2O_NS, "ascii"),  ascii,  true);
+		ext.define(ref_t(AMS2O_NS, "concat"), concat, true);
 		return ext;
 	}();
 
