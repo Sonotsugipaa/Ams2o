@@ -287,16 +287,27 @@ namespace {
 		std::string r;
 		char buffer[STREAM_BUFFER_SIZE];
 		size_t readn;
-		while(in && (0 < (readn = in.readsome(buffer, STREAM_BUFFER_SIZE-1)))) {
-			buffer[readn] = '\0';
-			r += buffer;
-		}
+		do {
+			while(in && (0 < (readn = in.readsome(buffer, STREAM_BUFFER_SIZE-1)))) {
+				buffer[readn] = '\0';
+				r += buffer;
+			}
+			readn = in.read(&buffer[0], 1)? 1 : 0;
+			if(readn > 0) {
+				buffer[readn] = '\0';
+				r += buffer;
+			} else {
+				/* this break directive is technically superfluous,
+				 * but it skips a conditional jump */
+				break;
+			}
+		} while(readn > 0);
 		return r;
 	}
 
 	amscript2::Script from_file(const char* path) {
 		std::ifstream is = std::ifstream(path);
-		amscript2::Script r = script_extension;
+		amscript2::Script r;
 		if(is) {
 			std::string src = file_to_str(is);
 			r = amscript2::Script(std::move(src));
@@ -308,9 +319,8 @@ namespace {
 	}
 
 	amscript2::Script from_stdin() {
-		amscript2::Script r;
-		/*std::string src = script_extension_src + file_to_str(std::cin);
-		r = amscript2::Script(std::move(src));*/
+		std::string src = file_to_str(std::cin);
+		amscript2::Script r = amscript2::Script(std::move(src));
 		return r;
 	}
 
