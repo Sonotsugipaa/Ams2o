@@ -4,7 +4,6 @@
 
 ### How To Use
 
-<p>
 1. Write a Amscript2 file
 2. Define the Ams2o options, if necessary (use the table below)
 3. Run <code>ams2o</code> using the file as input
@@ -15,7 +14,6 @@
      <code>./ams2o &lt; path/to/file</code>
      OR
      <code>echo 'hw: "Hello, world!" hw' | ./ams2o</code>
-</p>
 
 
 ### Utility functions
