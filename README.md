@@ -1,3 +1,13 @@
+# Ams2o Demo
+<p>
+This branch provides a demo for the Amscript2 language.
+</p> <p>
+To build and run the demo, simply navigate to the project's root directory and
+run <code>make</code>; once the process successfully terminates, navigate to
+<code>./demo</code> and run the <b>demo.sh</b> bash script on a terminal.
+</p>
+
+
 # Ams2o
 ## A string-crunching tool based on Amscript2
 

@@ -7,11 +7,12 @@ ALL_OBJS=$(patsubst src/%.cpp, build/%.o, $(CPP_SRCS))
 
 .PHONY: mkdemo
 mkdemo:
+	git submodule update --init
 	make reset
-	make -j bin/ams2o
+	make -j bin/ams
 	mkdir -p demo
 	mkdir -p project_source
-	mv -f bin/ams2o demo/ams2o
+	mv -f bin/ams demo/ams
 	rm -rf bin build
 	mv -f src/demo_script.ams demo/demo_script.ams
 	mv -f src/demo.sh demo/run_demo.sh
