@@ -1,4 +1,4 @@
-DEBUG=-g
+DEBUG=-DNDEBUG
 CPPFLAGS=-std=c++17 $(DEBUG) -O3 -Wall -Wpedantic -I./include -L./lib
 INCLUDE_AMS2=-I./Amscript2/include
 CPP_SRCS=$(wildcard src/*.cpp)
@@ -17,6 +17,7 @@ bin/%: src/main/%.cpp
 	# ----- C++ executable ----- #
 	make --no-print-directory bin/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) -o"$@" $^
+	strip "$@"
 
 # compiles a C++ source file from ./src
 build/%.o: src/%.cpp
@@ -37,6 +38,7 @@ lib/libamscript2.a: Amscript2/makefile
 bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o lib/libamscript2.a
 	make --no-print-directory bin/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) -o"$@" build/ams2o.o build/ext.o $< -lamscript2
+	strip "$@"
 
 
 .PHONY: setup clean reset
