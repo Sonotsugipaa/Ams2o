@@ -1,0 +1,28 @@
+// define the End-Of-Line and space characters
+
+space: " "
+eol:   "\n"
+
+
+
+// define a function for greeting someone
+
+greet(whom): {
+	"Hello, " whom "!"
+}
+
+
+
+// greet mom, dad, Alan Turing, the world and anyone else
+
+greet("mom")     space   // greet mom and dad on the same line
+greet("dad")     eol     // greet all the following people on separate lines
+greet("Turing")  eol
+greet("world")   eol
+greet("everyone")        // last greeting, no End-Of-Line needed
+
+
+
+/* Any amount of greetings can be performed,  *
+ * without the dangers of copy-pasting        *
+ * redundant portions of text.                */

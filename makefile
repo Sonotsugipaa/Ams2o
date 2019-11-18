@@ -5,6 +5,29 @@ CPP_SRCS=$(wildcard src/*.cpp)
 ALL_OBJS=$(patsubst src/%.cpp, build/%.o, $(CPP_SRCS))
 
 
+.PHONY: mkdemo
+mkdemo:
+	make reset
+	make -j bin/ams2o
+	mkdir -p demo
+	mkdir -p project_source
+	mv -f bin/ams2o demo/ams2o
+	rm -rf bin build
+	mv -f src/demo_script.ams demo/demo_script.ams
+	mv -f src/demo.sh demo/run_demo.sh
+	chmod 755 demo/run_demo.sh
+	mv -f ./lib project_source/lib
+	mv -f ./src project_source/src
+	mv -f ./Amscript2 project_source/Amscript2
+	#
+	#
+	#
+	# ----------------------------------------------------
+	# DEMO FOLDER GENERATED. NAVIGATE TO ./demo,
+	# THEN RUN run_demo.sh IN YOUR SHELL.
+	# ----------------------------------------------------
+
+
 # objects should not be removed automatically
 .PRECIOUS: build/%.o
 
