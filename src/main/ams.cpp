@@ -53,16 +53,23 @@ namespace ams2o {
 		return r;
 	}
 
+
+
 }
 
 
 
 int main(int argn, char** args) {
 	try {
-		if(argn > 1)
-			std::cout << ams2o::run(ams2o::from_file(args[1])) << std::endl;
-		else
+		if(argn <= 1) {
 			std::cout << ams2o::run(ams2o::from_stdin()) << std::endl;
+		} else {
+			amscript2::Script full_script;
+			for(size_t i=1; i < static_cast<size_t>(argn); ++i) {
+				full_script << ams2o::from_file(args[i]);
+			}
+			std::cout << ams2o::run(full_script) << std::endl;
+		}
 	} catch(ParseException& ex) {
 		std::cerr
 			<< "An error occurred while interpreting the script.\n"
