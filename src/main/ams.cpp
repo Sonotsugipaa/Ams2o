@@ -64,11 +64,11 @@ int main(int argn, char** args) {
 		if(argn <= 1) {
 			std::cout << ams2o::run(ams2o::from_stdin()) << std::endl;
 		} else {
-			amscript2::Script full_script;
-			for(size_t i=1; i < static_cast<size_t>(argn); ++i) {
+			amscript2::Script full_script = ams2o::from_file(args[1]);
+			for(size_t i=2; i < static_cast<size_t>(argn); ++i) {
 				full_script << ams2o::from_file(args[i]);
 			}
-			std::cout << ams2o::run(full_script) << std::endl;
+			std::cout << ams2o::run(full_script);
 		}
 	} catch(ParseException& ex) {
 		std::cerr

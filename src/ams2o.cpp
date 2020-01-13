@@ -236,7 +236,7 @@ namespace ams2o {
 		if(options.text_to_bin)
 			return binary(options, result);
 		else
-			return concat(options, result);
+			return concat(options, result) + '\n';
 	}
 
 }
