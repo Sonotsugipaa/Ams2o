@@ -5,6 +5,3 @@ ams2o::separator: ' + '
 ams2o::show_warnings: false
 
 hello(whom): { 'Hello,' whom '!' }
-
-hello('world')
-'The ASCII code for "a" is' ascii('a')
