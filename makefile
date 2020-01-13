@@ -23,7 +23,7 @@ bin/%: src/main/%.cpp
 build/%.o: src/%.cpp
 	# ----- C++ object ----- #
 	make --no-print-directory build/
-	g++ $(CPPFLAGS) $< -c -o"$@"
+	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $< -c -o"$@"
 
 
 %/makefile:
@@ -35,9 +35,9 @@ lib/libamscript2.a: Amscript2/makefile
 	make --directory="Amscript2/" lib/libamscript2.a
 	mv Amscript2/lib/libamscript2.a lib/libamscript2.a
 
-bin/ams2o: src/main/ams2o.cpp lib/libamscript2.a
+bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o lib/libamscript2.a
 	make --no-print-directory bin/
-	g++ $(CPPFLAGS) $(INCLUDE_AMS2) -o"$@" $< -lamscript2
+	g++ $(CPPFLAGS) $(INCLUDE_AMS2) -o"$@" $< build/ams2o.o build/ext.o -lamscript2
 	strip "$@"
 
 

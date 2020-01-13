@@ -1,0 +1,4 @@
+// Example Ams2o script
+
+hello('world') "\n"
+'The ASCII code for "a" is' ascii('a')
