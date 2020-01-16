@@ -4,16 +4,16 @@
 
 ### How To Use
 
-1. Write a Amscript2 file
+1. Write an Amscript2 file
 2. Define the Ams2o options, if necessary (use the table below)
-3. Run <code>ams2o</code> using the file as input
+3. Run <code>ams</code> using the file as input
    - use the file path as an command line argument. For example: <br/>
-     <code>./ams2o path/to/file</code>
-   - run <code>ams2o</code> without arguments, and pass the script file
+     <code>./ams path/to/file</code>
+   - run <code>ams</code> without arguments, and pass the script file
      to the shell's standard input. For example: <br/>
-     <code>./ams2o &lt; path/to/file</code>
+     <code>./ams &lt; path/to/file</code>
      OR
-     <code>echo 'hw: "Hello, world!" hw' | ./ams2o</code>
+     <code>echo 'hw: "Hello, world!" hw' | ./ams</code>
 
 
 ### Utility functions
@@ -59,7 +59,9 @@
 		<td> ams2o::word_size </td>
 		<td>
 			ams2o::int8 <br/> ams2o::int16 <br/>
-			ams2o::int32 <br/> ams2o::int64
+			ams2o::int32 <br/> ams2o::int64 <br/>
+			ams2o::uint8 <br/> ams2o::uint16 <br/>
+			ams2o::uint32 <br/> ams2o::uint64
 		</td>
 		<td> ams2o::int8 </td>
 	</tr>
@@ -80,9 +82,10 @@
 </table>
 
 <p>
-	To set an option's value, include it in the script as a definition. <br/>
-	For example, to disable warnings, write the following line:
-	<code>ams2o::show_warnings: ams2o::false</code>
+	To set an option's value, include it in the script as a function definition. <br/>
+	For example, to disable warnings, write one of the following lines: <br/>
+	<code>ams2o::show_warnings(): { ams2o::false }</code> <br>
+	<code>ams2o::show_warnings -> ams2o::false</code>
 </p>
 
 
@@ -91,9 +94,9 @@
 <pre>
 // Example Ams2o script
 
-ams2o::mode: ams2o::text
-ams2o::separator: ' + '
-ams2o::show_warnings: ams2o::false
+ams2o::mode           ->  ams2o::text
+ams2o::separator      ->  ' + '
+ams2o::show_warnings  ->  ams2o::false
 
 hello(whom): { 'Hello,' whom '!' }
 
