@@ -6,7 +6,13 @@ ALL_OBJS=$(patsubst src/%.cpp, build/%.o, $(CPP_SRCS))
 
 
 # objects should not be removed automatically
-.PRECIOUS: build/%.o
+.PRECIOUS: build/%.o build install
+
+
+build: bin/ams
+
+install: /usr/local/lib/libamscript2.so /usr/local/bin/ams
+
 
 # create a generic folder through a target dependency
 %/:
@@ -15,27 +21,30 @@ ALL_OBJS=$(patsubst src/%.cpp, build/%.o, $(CPP_SRCS))
 # links all C++ source files from ./src/main
 bin/%: src/main/%.cpp
 	# ----- C++ executable ----- #
-	make --no-print-directory bin/
+	$(MAKE) --no-print-directory bin/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) -o"$@" $^
 
 # compiles a C++ source file from ./src
 build/%.o: src/%.cpp
 	# ----- C++ object ----- #
-	make --no-print-directory build/
+	$(MAKE) --no-print-directory build/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $< -c -o"$@"
 
+/usr/local/lib/libamscript2.so: Amscript2/lib/libamscript2.so
+	# ----- Install Amscript2 shared library ----- #
+	sudo cp -f "$<" "$@"
+	sudo ldconfig
 
-%/makefile:
-	git submodule update --init $(patsubst %/makefile,%,$@)
+/usr/local/bin/ams: bin/ams
+	# ----- Install "ams" shell command ----- #
+	sudo cp -f "$<" "$@"
 
-lib/libamscript2.a: Amscript2/makefile
-	# ----- External static library ----- #
-	make --no-print-directory lib/
-	make --directory="Amscript2/" lib/libamscript2.a
-	mv Amscript2/lib/libamscript2.a lib/libamscript2.a
+Amscript2/%:
+	git submodule update --init Amscript2
+	$(MAKE) --directory=Amscript2 $(patsubst "Amscript2/%",%,"$@")
 
-bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o lib/libamscript2.a
-	make --no-print-directory bin/
+bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o
+	$(MAKE) --no-print-directory bin/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) -o"$@" build/ams2o.o build/ext.o $< -lamscript2
 
 
@@ -47,4 +56,4 @@ clean:
 
 reset:
 	rm -rf bin lib build
-	make --directory="Amscript2/" reset
+	$(MAKE) --directory="Amscript2/" reset
