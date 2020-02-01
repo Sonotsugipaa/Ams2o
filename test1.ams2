@@ -1,7 +1,0 @@
-// Example Ams2o script
-
-ams2o::mode: text
-ams2o::separator: ' + '
-ams2o::show_warnings: false
-
-hello(whom): { 'Hello,' whom '!' }
