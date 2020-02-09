@@ -53,8 +53,6 @@ namespace ams2o {
 		return r;
 	}
 
-
-
 }
 
 
@@ -65,7 +63,7 @@ int main(int argn, char** args) {
 			std::cout << ams2o::run(ams2o::from_stdin()) << std::endl;
 		} else {
 			amscript2::Script full_script = ams2o::from_file(args[1]);
-			for(size_t i=2; i < static_cast<size_t>(argn); ++i) {
+			for(size_t i=2; i < (size_t) argn; ++i) {
 				full_script << ams2o::from_file(args[i]);
 			}
 			std::cout << ams2o::run(full_script);
