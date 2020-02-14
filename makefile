@@ -49,15 +49,9 @@ Amscript2/%:
 
 bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o Amscript2/lib/libamscript2.so
 	$(MAKE) --no-print-directory bin/
-<<<<<<< HEAD
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $(LINK_AMS2) -o"$@" \
 		build/ams2o.o build/ext.o $< -lamscript2
 	strip "$@"
-=======
-	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $(LINK_AMS2) -o"$@" \
-		build/ams2o.o build/ext.o $< -lamscript2
-	strip "$@"
->>>>>>> master
 
 
 .PHONY: setup clean reset
