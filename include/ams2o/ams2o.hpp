@@ -41,7 +41,7 @@ namespace ams2o {
 	extern const amscript2::Namespace AMS2O_NS;
 
 
-	std::string run(amscript2::Script script);
+	std::string run(amscript2::Script script, bool debug);
 
 
 	namespace ext {

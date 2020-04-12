@@ -225,10 +225,26 @@ namespace ams2o {
 		parse_separator(opt, scr);
 	}
 
-	std::string run(amscript2::Script script) {
+	void print_base(amscript2::Scope& scope) {
+		auto base = scope.getBaseLayer();
+		if(base.size() != 1)  std::cerr << base.size() << " references\n";
+		else  std::cerr << "0 references\n";
+		for(const auto& entry : base) {
+			std::cerr << "Reference @ " << entry.first;
+			if(entry.first.isWeak())  std::cerr << " (weak)";
+			std::cerr << std::endl;
+		}
+		amscript2::ScopeView sv = scope;
+		for(auto& entry : scope.getConstSpace()) {
+			std::cerr << "Constant  @ " << entry.first << std::endl;
+		}
+	}
+
+	std::string run(amscript2::Script script, bool debug) {
 		ams2o::Options options;
 
 		script.import(ext::extension);
+		if(debug)  print_base(script.scope());
 
 		std::vector<amscript2::Value> result = script.run();
 		parse_options(options, script);
