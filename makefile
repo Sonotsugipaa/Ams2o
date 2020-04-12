@@ -1,4 +1,4 @@
-DEBUG=-g -DEBUG -O0
+DEBUG=-DNDEBUG -O3
 CPPFLAGS=-std=c++17 $(DEBUG) -Wall -Wpedantic -I./include -L./lib
 INCLUDE_AMS2=-I./Amscript2/include
 LINK_AMS2=-L./Amscript2/lib
