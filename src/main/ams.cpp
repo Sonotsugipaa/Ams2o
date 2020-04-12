@@ -59,7 +59,7 @@ namespace ams2o {
 
 
 int main(int argn, char** args) {
-	bool debug;
+	bool debug = false;
 	if(argn > 1 && 0 == ::strcmp(args[1], "--debug")) {
 		std::cerr << "DEBUGGING ENABLED\n";
 		debug = true; --argn; ++args;
