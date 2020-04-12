@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>  // only used for strcmp in "print_base"
 #include <vector>
 
 
@@ -58,15 +59,21 @@ namespace ams2o {
 
 
 int main(int argn, char** args) {
+	bool debug;
+	if(argn > 1 && 0 == ::strcmp(args[1], "--debug")) {
+		std::cerr << "DEBUGGING ENABLED\n";
+		debug = true; --argn; ++args;
+	}
 	try {
 		if(argn <= 1) {
-			std::cout << ams2o::run(ams2o::from_stdin());
+			amscript2::Script full_script = ams2o::from_stdin();
+			std::cout << ams2o::run(full_script, debug);
 		} else {
 			amscript2::Script full_script = ams2o::from_file(args[1]);
 			for(size_t i=2; i < (size_t) argn; ++i) {
 				full_script << ams2o::from_file(args[i]);
 			}
-			std::cout << ams2o::run(full_script);
+			std::cout << ams2o::run(full_script, debug);
 		}
 	} catch(ParseException& ex) {
 		std::cerr

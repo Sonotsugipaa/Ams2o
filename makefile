@@ -1,5 +1,5 @@
-DEBUG=-DNDEBUG
-CPPFLAGS=-std=c++17 $(DEBUG) -O3 -Wall -Wpedantic -I./include -L./lib
+DEBUG=-g -DEBUG -O0
+CPPFLAGS=-std=c++17 $(DEBUG) -Wall -Wpedantic -I./include -L./lib
 INCLUDE_AMS2=-I./Amscript2/include
 LINK_AMS2=-L./Amscript2/lib
 CPP_SRCS=$(wildcard src/*.cpp)
