@@ -12,7 +12,7 @@ namespace ams2o {
 
 
 	struct Options {
-		unsigned int byte_order = BIG_ENDIAN;
+		unsigned int byte_order = AMS2O_BIG_ENDIAN;
 		unsigned int word_size = AMS2O_SIZE_8;
 		bool text_to_bin = false;
 
