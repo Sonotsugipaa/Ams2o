@@ -1,7 +1,6 @@
 DEBUG=-g -DEBUG -O0
 CPPFLAGS=-std=c++17 $(DEBUG) -Wall -Wpedantic -I./include -L./lib
-INCLUDE_AMS2=-I./Amscript2/include
-LINK_AMS2=-L./Amscript2/lib
+LINK_AMS2=-Llib
 CPP_SRCS=$(wildcard src/*.cpp)
 ALL_OBJS=$(patsubst src/%.cpp, build/%.o, $(CPP_SRCS))
 
@@ -12,42 +11,32 @@ ALL_OBJS=$(patsubst src/%.cpp, build/%.o, $(CPP_SRCS))
 
 build: bin/ams
 
-install: /usr/local/bin/ams /usr/local/lib/libamscript2.so
+install: /usr/local/bin/ams
 
 
 # create a generic folder through a target dependency
 %/:
-	mkdir -p "$@"
+	@mkdir -p "$@"
 
 # links all C++ source files from ./src/main
 bin/%: src/main/%.cpp
 	# ----- C++ executable ----- #
-	$(MAKE) --no-print-directory bin/
+	@$(MAKE) --no-print-directory bin/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $(LINK_AMS2) -o"$@" $^
 
 # compiles a C++ source file from ./src
 build/%.o: src/%.cpp
 	# ----- C++ object ----- #
-	$(MAKE) --no-print-directory build/
+	@$(MAKE) --no-print-directory build/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $< -c -o"$@"
 
-.PHONY: /usr/local/lib/libamscript2.so
-/usr/local/lib/libamscript2.so: Amscript2/lib/libamscript2.so
-	# ----- Install Amscript2 shared library ----- #
-	sudo cp -f "$<" "$@"
-	sudo ldconfig
-
-PHONY: /usr/local/bin/ams
-/usr/local/bin/ams: bin/ams /usr/local/lib/libamscript2.so
+.PHONY: /usr/local/bin/ams
+/usr/local/bin/ams: bin/ams
 	# ----- Install "ams" shell command ----- #
 	sudo cp -f "$<" "$@"
 
-Amscript2/%:
-	git submodule update --init Amscript2
-	$(MAKE) --directory=Amscript2 $(patsubst "Amscript2/%",%,"$@")
-
-bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o Amscript2/lib/libamscript2.so
-	$(MAKE) --no-print-directory bin/
+bin/ams: src/main/ams.cpp build/ams2o.o build/ext.o
+	@$(MAKE) --no-print-directory bin/
 	g++ $(CPPFLAGS) $(INCLUDE_AMS2) $(LINK_AMS2) -o"$@" \
 		build/ams2o.o build/ext.o $< -lamscript2
 
@@ -60,4 +49,3 @@ clean:
 
 reset:
 	rm -rf bin lib build
-	$(MAKE) --directory="Amscript2/" reset
